@@ -1,29 +1,26 @@
-
-require('dotenv').config();
-
-
+// Importa el módulo 'pg'
 const { Pool } = require('pg');
 
 
+require('dotenv').config();
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT || 5432, 
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+    connectionString: process.env.DATABASE_URL,
+    
+    ssl: {
+        rejectUnauthorized: false 
+    }
 });
 
-
+// Verifica la conexión a la base de datos
 pool.connect()
-  .then(() => {
-    console.log('Conectado a la base de datos PostgreSQL');
-  })
-  .catch(err => {
-    console.error('Error al conectar a la base de datos', err);
-  });
+    .then(client => {
+        console.log('✅ Conectado a la base de datos PostgreSQL');
+        client.release();
+    })
+    .catch(err => {
+        console.error('❌ Error al conectar a la base de datos:', err);
+    });
 
-// Exporta el pool para usarlo en el resto de tu aplicación
+
 module.exports = pool;
